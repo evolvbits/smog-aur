@@ -1,0 +1,100 @@
+#!/usr/bin/env sh
+# Maintainer: William Canin <hello.williamcanin@gmail.com>
+
+# --- VARIABLES ---
+PKGVER=0.3.1
+PKGNAME="smog-bin"
+FINGERPRINT="09E5808E5970720142EDFC4FE6A5CC75350F3DCE"
+BUILD_DIR="aur"
+
+# --- UI---
+info()    { printf "\033[0;36m-> %s\033[0m\n" "$1"; }
+error()   { printf "\033[0;31mx %s\033[0m\n" "$1"; }
+success() { printf "\033[0;32m* %s\033[0m\n" "$1"; }
+
+# --- Checks ---
+[ "$(uname -s)" != "Linux" ] && { error "Linux only"; exit 1; }
+
+[ "$(uname -m)" != "x86_64" ] && { error "Only x86_64 supported"; exit 1; }
+
+command -v git >/dev/null || { error "git is required"; exit 1; }
+
+if [ "$(id -u)" -eq 0 ]; then error "Do not run as root or sudo"; exit 1; fi
+
+if ! command -v makepkg >/dev/null 2>&1; then
+  error "makepkg not found"
+  exit 1
+fi
+
+# --- Download the LICENSE temporarily to calculate the hash ---
+curl -sL "https://raw.githubusercontent.com/evolvbits/smog/main/LICENSE" -o /tmp/LICENSE.tmp
+LICENSE_HASH=$(sha256sum /tmp/LICENSE.tmp | awk '{print $1}')
+rm /tmp/LICENSE.tmp
+
+# --- Create base build ---
+mkdir -p $BUILD_DIR
+
+# --- Copy templates ---
+cp -f smog.install.template $BUILD_DIR/smog.install
+cp -f PKGBUILD.template $BUILD_DIR/PKGBUILD
+
+# --- Apply values to templates --- 
+sed -i -e "s/__PKGVER__/$PKGVER/" \
+  -e "s/__LICENSE_HASH__/$LICENSE_HASH/" \
+  -e "s/__PKGNAME__/$PKGNAME/" \
+  -e "s/__FINGERPRINT__/$FINGERPRINT/" $BUILD_DIR/PKGBUILD
+
+# --- Menu ----
+case "${1:-}" in
+  build)
+    cd $BUILD_DIR/
+    info "Building package..."
+    rm -f $BUILD_DIR/SHA256SUMS* 
+    makepkg --printsrcinfo > .SRCINFO
+    makepkg -sf --noconfirm
+    success "Build complete"
+    ;;
+
+  install)
+    cd $BUILD_DIR/
+    info "Building and installing package..."
+    makepkg -sfi --noconfirm
+    success "Install complete"
+    ;;
+
+  clean)
+    cd $BUILD_DIR/
+    info "Cleaning build files..."
+    rm -rf pkg src ./*.pkg.tar.* LICENSE smog-* SHA256SUMS* .SRCINFO PKGBUILD smog.install
+    success "Clean complete"
+    ;;
+  check)
+    cd $BUILD_DIR/
+    info "Recalculate checksums..."
+    makepkg --printsrcinfo > .SRCINFO
+    updpkgsums
+    ;;
+  publish)
+    if [ -f "$BUILD_DIR/PKGBUILD" ]; then
+      cd $BUILD_DIR/
+      git init -b master > /dev/null 2>&1
+      git remote add origin "ssh://aur@aur.archlinux.org/${PKGNAME}.git" > /dev/null 2>&1 || \
+      git remote set-url origin "ssh://aur@aur.archlinux.org/${PKGNAME}.git" > /dev/null 2>&1
+      git add PKGBUILD .SRCINFO smog.install
+      if ! git diff --cached --quiet; then
+        printf "Commit message: "
+        read commit_ < /dev/tty
+        git commit -m "$commit_"
+      else
+        info "Nothing to commit"
+      fi
+      # git push -u origin master
+    fi
+    ;;
+
+  *)
+    error "Unknown command: $1"
+    printf "Usage: %s [build|install|check|clean|publish]\n" "$0"
+    exit 1
+    ;;
+esac

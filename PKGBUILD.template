@@ -1,0 +1,49 @@
+# Maintainer: William Canin <hello.williamcanin@gmail.com>
+
+pkgname=__PKGNAME__
+pkgver=__PKGVER__
+pkgrel=1
+pkgdesc="Turn data into unreadable noise."
+arch=('x86_64')
+url="https://github.com/evolvbits/smog"
+license=('custom')
+depends=('glibc' 'gcc-libs')
+install='smog.install'
+options=('!strip' '!debug')
+
+# - Build and install via makepkg -
+# Before building, import the maintainer's GPG key:
+#   gpg --keyserver keyserver.ubuntu.com --recv-keys __FINGERPRINT__
+# Or via direct file:
+#   curl https://raw.githubusercontent.com/evolvbits/pubkey/main/pubkey.asc | gpg --import
+
+validpgpkeys=('__FINGERPRINT__')
+
+source=(
+  "smog-$pkgver-linux-x86_64::https://raw.githubusercontent.com/evolvbits/smog/binaries/v$pkgver/smog-$pkgver-linux-x86_64"
+  "SHA256SUMS::https://raw.githubusercontent.com/evolvbits/smog/binaries/v$pkgver/SHA256SUMS"
+  "SHA256SUMS.asc::https://raw.githubusercontent.com/evolvbits/smog/binaries/v$pkgver/SHA256SUMS.asc"
+  "LICENSE::https://raw.githubusercontent.com/evolvbits/smog/main/LICENSE"
+)
+
+sha256sums=(
+  'SKIP'         # binary — verified via GPG
+  'SKIP'         # SHA256SUMS — verified via GPG (SHA256SUMS.asc)
+  'SKIP'         # GPG signature
+  '__LICENSE_HASH__' # LICENSE - manual: sha256sum LICENSE
+)
+
+prepare() {
+  cd "$srcdir"
+
+  echo "==> Verifying binary via SHA256SUMS..."
+  grep "smog-$pkgver-linux-x86_64" SHA256SUMS | sha256sum -c
+}
+
+package() {
+  install -Dm755 "$srcdir/smog-$pkgver-linux-x86_64" \
+    "$pkgdir/usr/bin/smog"
+
+  install -Dm644 "$srcdir/LICENSE" \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

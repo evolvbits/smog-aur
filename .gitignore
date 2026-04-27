@@ -1,0 +1,8 @@
+# Backups
+# -------
+*~
+*.bak
+
+# Arch Linux AUR files
+# --------------------
+aur/
