@@ -1,4 +1,8 @@
-# Smog
+<p align="center">
+  <img style="border-radius: 5px;" src="https://raw.githubusercontent.com/evolvbits/smog/refs/heads/main/.github/logo/compact/smog-git.svg" alt="smog" width="180"/>
+</p>
+
+<h1 align="center">Turn data into unreadable noise.</h1>
 
 AUR packaging for **Smog**
 
@@ -93,3 +97,12 @@ Always use:
 ```sh
 sh init.sh check
 ```
+
+##  Official page
+
+https://evolvbits.github.io/products/smog/
+
+
+---
+
+© [Evolvbits](https://evolvbits.github.io) - All rights reserved.
