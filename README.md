@@ -18,7 +18,7 @@ sh init.sh build
 sh init.sh install
 ```
 
-> Note: Always test with `sh init install` before pushing in AUR.
+> Note: Always test with `sh init.sh install` before pushing in AUR.
 
 ### Clean all build with script `init.sh`
 
@@ -50,19 +50,19 @@ PKGVER=0.3.2
 2. Recalculate checksums:
 
 ```sh
-sh init check
+sh init.sh check
 ```
 
 3. Rebuild:
 
 ```sh
-sh init build
+sh init.sh build
 ```
 
 4. Commit and push:
 
 ```sh
-sh init publish
+sh init.sh publish
 ```
 
 Done.
@@ -80,7 +80,7 @@ Done.
 
 * This repository does **not** contain the source code.
 * The PKGBUILD downloads the source directly from GitHub releases.
-* Always test with `sh init install` before pushing.
+* Always test with `sh init.sh install` before pushing.
 
 ---
 
@@ -91,5 +91,5 @@ Never update `sha256sums` by hand.
 Always use:
 
 ```sh
-sh init check
+sh init.sh check
 ```
