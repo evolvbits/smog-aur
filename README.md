@@ -10,24 +10,24 @@ AUR packaging for **Smog**
 
 ## 🔧 Maintainer workflow (AUR)
 
-### Build package with script `init.sh`
+### Build package with script `run`
 
 ```sh
-sh init.sh build
+./run build
 ```
 
-### Install package local with script `init.sh` (test)
+### Install package local with script `run` (test)
 
 ```sh
-sh init.sh install
+./run install
 ```
 
-> Note: Always test with `sh init.sh install` before pushing in AUR.
+> Note: Always test with `./run install` before pushing in AUR.
 
-### Clean all build with script `init.sh`
+### Clean all build with script `run`
 
 ```sh
-sh init.sh clean
+./run clean
 ```
 
 ---
@@ -35,7 +35,7 @@ sh init.sh clean
 ## 🚀 Initial publish to AUR
 
 ```sh
-sh init.sh publish
+./run publish
 ```
 
 ---
@@ -44,29 +44,29 @@ sh init.sh publish
 
 Example: new version `0.3.2`
 
-1. Update version in `init.sh`:
+1. Update version in `run`:
 
 ```sh
-# edit init.sh
+# edit run
 PKGVER=0.3.2
 ```
 
 2. Recalculate checksums:
 
 ```sh
-sh init.sh check
+./run check
 ```
 
 3. Rebuild:
 
 ```sh
-sh init.sh build
+./run build
 ```
 
 4. Commit and push:
 
 ```sh
-sh init.sh publish
+./run publish
 ```
 
 Done.
@@ -84,7 +84,7 @@ Done.
 
 * This repository does **not** contain the source code.
 * The PKGBUILD downloads the source directly from GitHub releases.
-* Always test with `sh init.sh install` before pushing.
+* Always test with `./run install` before pushing.
 
 ---
 
@@ -95,7 +95,7 @@ Never update `sha256sums` by hand.
 Always use:
 
 ```sh
-sh init.sh check
+./run check
 ```
 
 ##  Official page
